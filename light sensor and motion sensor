@@ -1,0 +1,33 @@
+const int LIGHT_SENSOR_PIN = 3.3; // Arduino pin connected to light sensor's  pin
+const int LED_PIN          = D4;  // Arduino pin connected to LED's pin
+const int ANALOG_THRESHOLD = 500;
+const int sensorpin = D6; // sensor for motion 
+// variables will change:
+int analogValue;
+int tempSensorInput =0 ;        //This reads the motion status
+
+void setup() {
+pinMode(LED_PIN, OUTPUT);
+pinMode(LIGHT_SENSOR_PIN, INPUT);// set arduino pin to output mode
+pinMode(LED_PIN, OUTPUT);
+pinMode(sensorpin, INPUT);// set argon pin to output mode
+}
+
+void loop() {
+analogValue = analogRead(LIGHT_SENSOR_PIN); // read the input on analog pin
+
+  if(analogValue < ANALOG_THRESHOLD)
+    digitalWrite(LED_PIN, HIGH); // turn on LED
+  else
+    digitalWrite(LED_PIN, LOW);  // turn off LED
+    
+tempSensorInput = digitalRead(sensorpin);     //reads the input on temp pin
+  
+  if (tempSensorInput == HIGH) 	 //checks to see if their is an input. If there is: the led turns on, the argon publishes an event to trigger IFTTT, waits 5 seconds, and finally turns the LED off.
+  {            
+    digitalWrite(LED_PIN, HIGH);
+    Particle.publish("IntruderAlert", "Uh oh");
+    delay(5000);
+    digitalWrite(LED_PIN, LOW); 
+  }
+}
