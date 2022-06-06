@@ -1,0 +1,61 @@
+const int LedPin = D4;                  //LED pin
+const int SensorPin = D6;               //Sensor pin
+const int tempSensorInput = 0;        //This reads the motion status
+
+// The following line is optional, but recommended in most firmware. It 
+// allows your code to run before the cloud is connected. In this case, 
+// it will begin blinking almost immediately instead of waiting until 
+// breathing cyan,
+SYSTEM_THREAD(ENABLED);
+
+// The setup() method is called once when the device boots.
+
+int ledToggle(String command)
+{
+    if (command.equals("on"))
+    {
+        digitalWrite(LedPin, HIGH);
+        return 1;
+    }
+    else if (command.equals("off"))
+    {
+        digitalWrite(LedPin, LOW);
+        return 0;
+    }
+    else
+    {
+        // Unknown option
+        return -1;
+    }
+}
+
+// The setup() method is called once when the device boots.
+void setup()
+{
+    // In order to set a pin, you must tell Device OS that the
+    // pin is an OUTPUT pin.
+    // This is often done from setup() since you only need to
+    // do it once.
+    pinMode(LedPin, OUTPUT);
+    //nMode(SensorPin, INPUT);
+
+    // This registers a function call. When the function "led"
+    // is called from the cloud, the ledToggle() function above
+    // will be called.
+    Particle.function("led", ledToggle);
+}
+
+// The loop() method is called frequently.
+void loop() {
+
+    tempSensorInput = digitalRead(SensorPin);     //reads the input value
+  
+  if (tempSensorInput == HIGH) 	 //checks to see if their is an input. If there is: the led turns on, the argon publishes an event to trigger IFTTT, waits 5 seconds, and finally turns the LED off.
+  {            
+    digitalWrite(LedPin, HIGH);
+    Particle.publish("IntruderAlert", "Uh oh");
+    delay(5000);
+    digitalWrite(LedPin, LOW); 
+    
+  } 
+}
